@@ -1,0 +1,1 @@
+console.log("This can be printed into another file with using require  keyword ")

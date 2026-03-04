@@ -1,0 +1,2 @@
+In section we have understood why node js is fast because of libuv and how it helps us to 
+manage async tasks
