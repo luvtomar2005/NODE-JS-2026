@@ -29,40 +29,61 @@
 
 /* Understanding routing in more detail */
 
-const express = require('express');
+// const express = require('express');
 
+// const app = express();
+
+// app.use('/user' ,[ (req , res , next) => {
+//     console.log("This is the route 1");
+//     // res.send("Response1 !");
+//     next();
+// },
+// (req , res, next) => {
+//     console.log("This is the response 2");
+//     // res.send("Response2 !");
+//     next();
+// }],
+// (req , res , next) => {
+//     console.log('This is the route3 ');
+//     next();
+//     res.send("Response3 !");
+    
+// },
+// (req , res , next) => {
+//     console.log("This is the route 4");
+//      next();
+//     res.send("Response4 !");
+   
+// },
+// (req , res , next) => {
+//     console.log("This is the route 5");
+//     res.send("Response5 !");
+//     next();
+// }
+
+// )
+
+// app.listen(1000 , () => {
+//     console.log("Server is running sucessfully at port 1000");
+// })
+
+/* Going more deep in router */
+
+const express = require('express');
 const app = express();
 
-app.use('/user' ,[ (req , res , next) => {
-    console.log("This is the route 1");
-    // res.send("Response1 !");
-    next();
-},
-(req , res, next) => {
-    console.log("This is the response 2");
-    // res.send("Response2 !");
-    next();
-}],
-(req , res , next) => {
-    console.log('This is the route3 ');
-    next();
-    res.send("Response3 !");
-    
-},
-(req , res , next) => {
-    console.log("This is the route 4");
-     next();
-    res.send("Response4 !");
-   
-},
-(req , res , next) => {
-    console.log("This is the route 5");
-    res.send("Response5 !");
-    next();
-}
+const { adminAuth } = require('./middleware/auth');
 
-)
+app.use('/admin', adminAuth);
 
-app.listen(1000 , () => {
-    console.log("Server is running sucessfully at port 1000");
-})
+app.get('/admin/getAllData', (req,res)=>{
+    res.send("All data sent");
+});
+
+app.delete('/admin/deleteUserData', (req,res)=>{
+    res.send("All data deleted");
+});
+
+app.listen(1000, ()=>{
+    console.log("Server running at port 1000");
+});
