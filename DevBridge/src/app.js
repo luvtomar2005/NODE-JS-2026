@@ -69,21 +69,58 @@
 
 /* Going more deep in router */
 
+// const express = require('express');
+// const app = express();
+
+// const { adminAuth } = require('./middleware/auth');
+
+// app.use('/admin', adminAuth);
+
+// app.get('/admin/getAllData', (req,res)=>{
+//     res.send("All data sent");
+// });
+
+// app.delete('/admin/deleteUserData', (req,res)=>{
+//     res.send("All data deleted");
+// });
+
+// app.listen(1000, ()=>{
+//     console.log("Server running at port 1000");
+// });
+
+/* Connecting our database */
 const express = require('express');
 const app = express();
+const connectDB = require('./config/database');
+const User = require('./models/users');
 
-const { adminAuth } = require('./middleware/auth');
 
-app.use('/admin', adminAuth);
+// creating signup api to adding data to database
+app.post("/signup" ,  async (req , res) => {
+    // creating a document instance using the model.
+    const user = new User({
+        firstName : "Luv",
+        lastName : "Tomar",
+        emailId : "LuvTomar@3004gmail.com",
+        passWord : "fkarklq2j431"
+    });
+    try{
+        await user.save();
+        res.send("User added successfully");
 
-app.get('/admin/getAllData', (req,res)=>{
-    res.send("All data sent");
-});
-
-app.delete('/admin/deleteUserData', (req,res)=>{
-    res.send("All data deleted");
-});
-
-app.listen(1000, ()=>{
-    console.log("Server running at port 1000");
-});
+    }
+    catch(err){
+        res.status(400).send("Error is encountered");
+    }
+    
+})
+connectDB()
+    .then(() => {
+        console.log("Database is connected fine...");
+        app.listen(1000 , () => {
+            console.log("Server is running at port 1000");
+        });
+    })
+    .catch((err) => {
+        console.error("Database connection failed:", err);
+    });
