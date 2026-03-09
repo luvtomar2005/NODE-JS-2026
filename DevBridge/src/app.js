@@ -23,7 +23,7 @@ app.post("/signup" ,  async (req , res) => {
 
     }
     catch(err){
-        res.status(400).send("Error is encountered");
+        res.status(400).send(err.message);
     }
     
 })
