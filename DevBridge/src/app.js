@@ -72,18 +72,28 @@ app.delete("/user" ,async (req, res) => {
 
 // Api for updating the user 
 
-app.patch("/user" , async (req , res) =>{
+// Api for updating the user 
+app.patch("/user", async (req, res) => {
     const userId = req.body.userId;
     const data = req.body;
-    try{
-        await User.findByIdAndUpdate({_id: userId}, data);
-        res.send("User updates succesfully");
-    }
-    catch(err){
-        res.status(404).send("Something went wrong!!");
-    }
-})
 
+    try {
+        const user = await User.findByIdAndUpdate(
+            { _id: userId },
+            data,
+            {
+                returnDocument: "after",
+                runValidators: true
+            }
+        );
+
+        console.log(user);
+        res.send("User updated successfully");
+    }
+    catch (err) {
+        res.status(400).send("UPDATE FAILED: " + err.message);
+    }
+});
 connectDB()
     .then(() => {
         console.log("Database is connected fine...");
