@@ -1,11 +1,10 @@
-
-
 /* Connecting our database */
 const express = require('express');
 const app = express();
 const connectDB = require('./config/database');
 const User = require('./models/users');
-
+const { validateSignUpData } = require('./utils/helper');
+const bcrypt = require("bcrypt");
 app.use(express.json()); // using express.json middleware
 /* app.use(express.json()) is Express middleware used to parse incoming requests with 
 JSON payloads. It converts the JSON data from the 
@@ -14,10 +13,26 @@ request body into a JavaScript object and makes it available in req.body. */
 
 // creating signup api to adding data to database
 app.post("/signup" ,  async (req , res) => {
-    // creating a document instance using the model.
-    const user = new User(req.body);
-    
+    // validation of data
     try{
+
+    validateSignUpData(req);
+     ;
+
+    // Encrypt the password
+   
+    const { firstName, lastName, emailId, passWord } = req.body
+    const passWordHash = await bcrypt.hash(passWord , 10);
+    console.log(passWordHash);
+    // creating a document instance using the model.
+    const user = new User({
+        firstName,
+        lastName,
+        emailId,
+        passWord : passWordHash
+    });
+    
+    
         await user.save();
         res.send("User added successfully");
 
