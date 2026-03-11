@@ -85,7 +85,27 @@ app.delete("/user" ,async (req, res) => {
     }
 })
 
-// Api for updating the user 
+// Api for user login
+app.post("/login" , async(req , res) => {
+    try{
+        const {emailId , passWord} = req.body;
+        const user = await User.findOne({emailId : emailId});
+        if(!user){
+            throw new Error("Invalid credentials");
+        }
+        const isPassWordValid = await bcrypt.compare(passWord, user.passWord);
+        if(isPassWordValid){
+            res.send("User login successfully");
+        }
+        else{
+            throw new Error("Invalid credentials");
+        }
+
+    }
+    catch(err){
+        res.status(400).send("Error : " + err.message);
+    }
+})
 
 // Api for updating the user 
 app.patch("/user/:userId", async (req, res) => {
@@ -117,6 +137,9 @@ app.patch("/user/:userId", async (req, res) => {
         res.status(400).send("UPDATE FAILED: " + err.message);
     }
 });
+
+
+
 connectDB()
     .then(() => {
         console.log("Database is connected fine...");
