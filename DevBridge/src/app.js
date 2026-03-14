@@ -5,7 +5,12 @@ const connectDB = require('./config/database');
 const User = require('./models/users');
 const { validateSignUpData } = require('./utils/helper');
 const bcrypt = require("bcrypt");
-app.use(express.json()); // using express.json middleware
+const cookieParser = require("cookie-parser");
+const jwt = require("jsonwebtoken");
+app.use(express.json()); 
+
+app.use(cookieParser());
+
 /* app.use(express.json()) is Express middleware used to parse incoming requests with 
 JSON payloads. It converts the JSON data from the 
 request body into a JavaScript object and makes it available in req.body. */
@@ -95,6 +100,12 @@ app.post("/login" , async(req , res) => {
         }
         const isPassWordValid = await bcrypt.compare(passWord, user.passWord);
         if(isPassWordValid){
+            // Creating a jwt token
+            const token = await jwt.sign({ _id: user._id} , "DevBridge@14022005");
+            console.log(token);
+
+            // Add the token to cookie and send the response back to user 
+            res.cookie("token" , token);
             res.send("User login successfully");
         }
         else{
@@ -138,8 +149,37 @@ app.patch("/user/:userId", async (req, res) => {
     }
 });
 
+// Api for profile
+app.get("/profile", async (req, res) => {
+    try {
 
+        const cookies = req.cookies;
+        const { token } = cookies;
 
+        if (!token) {
+            throw new Error("Token is not there");
+        }
+
+        const decodedMessage = jwt.verify(token, "DevBridge@14022005");
+        console.log(decodedMessage);
+
+        const { _id } = decodedMessage;
+        console.log("Logged In user", _id);
+
+        const user = await User.findById(_id);
+
+        if (!user) {
+            return res.status(404).send("User not found");
+        }
+
+        console.log(cookies);
+
+        res.send(user);
+
+    } catch (err) {
+        res.status(401).send("ERROR: " + err.message);
+    }
+});
 connectDB()
     .then(() => {
         console.log("Database is connected fine...");
