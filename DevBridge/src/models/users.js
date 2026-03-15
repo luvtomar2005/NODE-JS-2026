@@ -1,5 +1,8 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+
 const userSchema = new mongoose.Schema(
   {
     firstName: {
@@ -16,20 +19,20 @@ const userSchema = new mongoose.Schema(
       lowercase: true,
       unique: true,
       trim: true,
-      validate(value){
-        if(!validator.isEmail(value)){
-            throw new Error("Invalid email address : "  + value);
+      validate(value) {
+        if (!validator.isEmail(value)) {
+          throw new Error("Invalid email address: " + value);
         }
-      }
+      },
     },
     passWord: {
       type: String,
       required: true,
-      validate(value){
-        if(!validator.isStrongPassword(value)){
-            throw new Error("Enter a strong password : " + value);
+      validate(value) {
+        if (!validator.isStrongPassword(value)) {
+          throw new Error("Enter a strong password");
         }
-      }
+      },
     },
     age: {
       type: Number,
@@ -43,11 +46,11 @@ const userSchema = new mongoose.Schema(
       type: String,
       default:
         "https://th.bing.com/th/id/OIP.LsepWx6o3jwZ-iFTRvUrNgHaHa?w=191&h=191&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3",
-        validate(value){
-            if(!validator.isURL(value)){
-                throw new Error("This is not the correct url " + value);
-            }
+      validate(value) {
+        if (!validator.isURL(value)) {
+          throw new Error("Invalid URL: " + value);
         }
+      },
     },
     about: {
       type: String,
@@ -59,7 +62,35 @@ const userSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  },
+  }
 );
+
+
+/* GENERATE JWT TOKEN */
+userSchema.methods.getJWT = async function () {
+  const user = this;
+
+  const token = jwt.sign(
+    { _id: user._id },
+    "DevBridge@14022005",
+    { expiresIn: "7d" }
+  );
+
+  return token;
+};
+
+
+/* VALIDATE PASSWORD */
+userSchema.methods.validatePassword = async function (passwordInput) {
+  const user = this;
+
+  const isPasswordValid = await bcrypt.compare(
+    passwordInput,
+    user.passWord
+  );
+
+  return isPasswordValid;
+};
+
 
 module.exports = mongoose.model("User", userSchema);
