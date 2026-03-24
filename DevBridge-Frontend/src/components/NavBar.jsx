@@ -1,6 +1,11 @@
 import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 function NavBar() {
+  const user = useSelector((store) => store.user);
+  const profileImage =
+    user?.photoUrl || "https://api.dicebear.com/9.x/thumbs/svg?seed=DevBridge";
+
   return (
     <header className="sticky top-0 z-50 border-b border-violet-100/80 bg-gradient-to-r from-indigo-50 via-violet-50 to-fuchsia-50 shadow-sm backdrop-blur">
       <nav className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8">
@@ -29,18 +34,33 @@ function NavBar() {
         </div>
 
         <div className="flex items-center gap-3">
-          <Link
-            to="/login"
-            className="rounded-full border border-violet-200 bg-white px-4 py-2 text-sm font-semibold text-violet-700 shadow-sm transition hover:bg-violet-50"
-          >
-            Login
-          </Link>
+          {!user && (
+            <Link
+              to="/login"
+              className="rounded-full border border-violet-200 bg-white px-4 py-2 text-sm font-semibold text-violet-700 shadow-sm transition hover:bg-violet-50"
+            >
+              Login
+            </Link>
+          )}
           <Link
             to="/profile"
             className="rounded-full bg-gradient-to-r from-indigo-600 to-fuchsia-600 px-4 py-2 text-sm font-semibold text-white shadow-md transition hover:from-indigo-700 hover:to-fuchsia-700"
           >
             Profile
           </Link>
+          {user && (
+            <Link
+              to="/profile"
+              aria-label="Open profile"
+              className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border-2 border-violet-200 bg-white shadow-sm transition hover:border-fuchsia-400"
+            >
+              <img
+                src={profileImage}
+                alt={`${user?.firstName || "User"} avatar`}
+                className="h-full w-full object-cover"
+              />
+            </Link>
+          )}
         </div>
       </nav>
     </header>
