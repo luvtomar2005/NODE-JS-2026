@@ -6,6 +6,7 @@ import { BASE_URL } from "../utils/constants";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { addUser } from "../utils/userSlice";
+import globalCollabBg from "../assets/ChatGPT Image Mar 27, 2026, 09_36_54 AM.png";
 
 const Body = () => {
   const dispatch = useDispatch();
@@ -39,8 +40,14 @@ const Body = () => {
   return (
     <div className="flex min-h-screen flex-col">
       <NavBar />
-      <main className="flex-1">
-        <Outlet />
+      <main
+        className="relative flex-1 bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: `url(${globalCollabBg})` }}
+      >
+        <div className="absolute inset-0 bg-slate-900/25"></div>
+        <div className="relative z-10 h-full">
+          <Outlet />
+        </div>
       </main>
       <Footer />
     </div>

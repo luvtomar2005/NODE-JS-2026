@@ -9,7 +9,7 @@ import { BASE_URL } from "../utils/constants";
 
 
 const Login = () => {
-  const [emailId, setEmailId] = useState("IronMan@mail.com");
+  const [emailId, setEmailId] = useState("IronMan@gmail.com");
   const [passWord, setPassWord] = useState("Iron@1234");
   const [error , setError] = useState("");
   const dispatch = useDispatch();
@@ -33,7 +33,7 @@ const Login = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#cfe6f8] px-6 py-10 flex items-center justify-center font-sans">
+    <div className="px-6 py-10 flex items-center justify-center font-sans">
       <div className="w-full max-w-[920px] min-h-[500px] rounded-2xl overflow-hidden shadow-[0_8px_24px_rgba(0,0,0,0.08)] grid grid-cols-1 md:grid-cols-[1fr_1.15fr]">
         
         <div className="bg-[#d7e9f7] px-9 pt-12 pb-6 flex flex-col">
