@@ -1,8 +1,11 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 function NavBar() {
   const user = useSelector((store) => store.user);
+  const [open, setOpen] = useState(false);
+
   const profileImage =
     user?.photoUrl || "https://api.dicebear.com/9.x/thumbs/svg?seed=DevBridge";
 
@@ -42,24 +45,51 @@ function NavBar() {
               Login
             </Link>
           )}
-          <Link
-            to="/profile"
-            className="rounded-full bg-gradient-to-r from-indigo-600 to-fuchsia-600 px-4 py-2 text-sm font-semibold text-white shadow-md transition hover:from-indigo-700 hover:to-fuchsia-700"
-          >
-            Profile
-          </Link>
           {user && (
-            <Link
-              to="/profile"
-              aria-label="Open profile"
-              className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border-2 border-violet-200 bg-white shadow-sm transition hover:border-fuchsia-400"
-            >
-              <img
-                src={profileImage}
-                alt={`${user?.firstName || "User"} avatar`}
-                className="h-full w-full object-cover"
-              />
-            </Link>
+            <div className="relative flex items-center gap-3">
+              <span className="hidden text-sm font-semibold text-violet-700 sm:block">
+                Hii {user?.firstName || "there"}
+              </span>
+
+              <button
+                type="button"
+                onClick={() => setOpen((v) => !v)}
+                aria-label="Open user menu"
+                className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border-2 border-violet-200 bg-white shadow-sm transition hover:border-fuchsia-400"
+              >
+                <img
+                  src={profileImage}
+                  alt={`${user?.firstName || "User"} avatar`}
+                  className="h-full w-full object-cover"
+                />
+              </button>
+
+              {open && (
+                <div className="absolute right-0 top-12 w-44 overflow-hidden rounded-xl border border-violet-100 bg-white shadow-lg">
+                  <Link
+                    to="/profile"
+                    onClick={() => setOpen(false)}
+                    className="block px-4 py-3 text-sm font-semibold text-violet-700 transition hover:bg-violet-50"
+                  >
+                    Profile
+                  </Link>
+                  <Link
+                    to="/settings"
+                    onClick={() => setOpen(false)}
+                    className="block px-4 py-3 text-sm font-semibold text-violet-700 transition hover:bg-violet-50"
+                  >
+                    Settings
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={() => setOpen(false)}
+                    className="block w-full px-4 py-3 text-left text-sm font-semibold text-red-600 transition hover:bg-red-50"
+                  >
+                    Logout
+                  </button>
+                </div>
+              )}
+            </div>
           )}
         </div>
       </nav>
