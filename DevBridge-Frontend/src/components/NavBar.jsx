@@ -1,10 +1,25 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
-import { useSelector } from "react-redux";
-
+import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { BASE_URL } from "../utils/constants";
+import axios from "axios";
+import { removeUser } from "../utils/userSlice";
 function NavBar() {
   const user = useSelector((store) => store.user);
   const [open, setOpen] = useState(false);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    try{
+      await axios.post(BASE_URL + "/logout" , {} , {withCredentials : true});
+      dispatch(removeUser());
+      return navigate("/login");
+    } 
+    catch(err){
+        // Error logic will be redirect 
+    }
+  }
 
   const profileImage =
     user?.photoUrl || "https://api.dicebear.com/9.x/thumbs/svg?seed=DevBridge";
@@ -82,7 +97,10 @@ function NavBar() {
                   </Link>
                   <button
                     type="button"
-                    onClick={() => setOpen(false)}
+                    onClick={async () => {
+                      setOpen(false);
+                      await handleLogout();
+                    }}
                     className="block w-full px-4 py-3 text-left text-sm font-semibold text-red-600 transition hover:bg-red-50"
                   >
                     Logout

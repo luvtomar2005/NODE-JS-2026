@@ -11,11 +11,12 @@ import { BASE_URL } from "../utils/constants";
 const Login = () => {
   const [emailId, setEmailId] = useState("IronMan@mail.com");
   const [passWord, setPassWord] = useState("Iron@1234");
-
+  const [error , setError] = useState("");
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const handleLogin = async (e) => {
       e.preventDefault();
+      setError("");
       try{
         const res = await axios.post( BASE_URL + "/login", {
           emailId,
@@ -26,6 +27,7 @@ const Login = () => {
         return navigate("/feed");
       }
       catch(err){
+        setError(err?.response?.data || "Something went wrong");
         console.log(err);
       }
   }
@@ -80,6 +82,11 @@ const Login = () => {
               placeholder="Enter password"
               className="h-11 rounded-md border border-slate-300 px-3 text-sm text-slate-900 bg-white outline-none focus:border-[#0a66c2] focus:ring-1 focus:ring-[#0a66c2]"
             />
+            {error && (
+              <p className="mt-2 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-600">
+                {error}
+              </p>
+            )}
 
             <button
               type="submit"
