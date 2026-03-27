@@ -14,6 +14,9 @@ const EditProfile = () => {
   const [skillsInput, setSkillsInput] = useState(
     Array.isArray(user?.skills) ? user.skills.join(", ") : "",
   );
+  const [photoUrl, setPhotoUrl] = useState(user?.photoUrl || "");
+  const [age, setAge] = useState(user?.age || "");
+  const [gender, setGender] = useState(user?.gender || "");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -45,6 +48,9 @@ const EditProfile = () => {
         about: about.trim(),
         skills: parsedSkills,
       };
+      if (photoUrl.trim()) payload.photoUrl = photoUrl.trim();
+      if (age) payload.age = Number(age);
+      if (gender) payload.gender = gender;
 
       const res = await axios.patch(BASE_URL + "/profile/edit", payload, {
         withCredentials: true,
@@ -108,6 +114,43 @@ const EditProfile = () => {
             </label>
           </div>
 
+          <div className="mt-4 grid gap-4 sm:grid-cols-2">
+            <label className="text-sm font-semibold text-slate-700">
+              Age
+              <input
+                type="number"
+                value={age}
+                onChange={(e) => setAge(e.target.value)}
+                className="mt-1 h-11 w-full rounded-md border border-slate-300 bg-white px-3 text-sm outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500"
+                placeholder="Enter your age"
+              />
+            </label>
+            <label className="text-sm font-semibold text-slate-700">
+              Gender
+              <select
+                value={gender}
+                onChange={(e) => setGender(e.target.value)}
+                className="mt-1 h-11 w-full rounded-md border border-slate-300 bg-white px-3 text-sm outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500"
+              >
+                <option value="">Select Gender</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="others">Others</option>
+              </select>
+            </label>
+          </div>
+
+          <label className="mt-4 block text-sm font-semibold text-slate-700">
+            Profile Photo URL
+            <input
+              type="text"
+              value={photoUrl}
+              onChange={(e) => setPhotoUrl(e.target.value)}
+              className="mt-1 h-11 w-full rounded-md border border-slate-300 bg-white px-3 text-sm outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500"
+              placeholder="https://example.com/photo.jpg"
+            />
+          </label>
+
           <label className="mt-4 block text-sm font-semibold text-slate-700">
             About
             <textarea
@@ -159,7 +202,7 @@ const EditProfile = () => {
             <div className="rounded-2xl bg-slate-950 p-5 text-white">
               <img
                 src={
-                  user?.photoUrl ||
+                  photoUrl || user?.photoUrl ||
                   "https://api.dicebear.com/9.x/thumbs/svg?seed=DevBridge"
                 }
                 alt="Profile preview"

@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { BASE_URL } from "../utils/constants";
 import axios from "axios";
 import { removeUser } from "../utils/userSlice";
+import { removeFeed } from "../utils/FeedSlice";
 function NavBar() {
   const user = useSelector((store) => store.user);
   const [open, setOpen] = useState(false);
@@ -11,15 +12,16 @@ function NavBar() {
   const navigate = useNavigate();
 
   const handleLogout = async () => {
-    try{
-      await axios.post(BASE_URL + "/logout" , {} , {withCredentials : true});
+    try {
+      await axios.post(BASE_URL + "/logout", {}, { withCredentials: true });
       dispatch(removeUser());
+      dispatch(removeFeed());
       return navigate("/login");
-    } 
-    catch(err){
-        // Error logic will be redirect 
+    } catch (err) {
+      console.error("Error during logout:", err);
+      alert("Something went wrong while logging out. Please try again.");
     }
-  }
+  };
 
   const profileImage =
     user?.photoUrl || "https://api.dicebear.com/9.x/thumbs/svg?seed=DevBridge";
@@ -40,15 +42,15 @@ function NavBar() {
         </Link>
 
         <div className="hidden items-center gap-8 text-sm font-semibold text-violet-700 md:flex">
-          <a href="#" className="transition hover:text-fuchsia-600">
+          <Link to="/feed" className="transition hover:text-fuchsia-600">
             Discover
-          </a>
-          <a href="#" className="transition hover:text-fuchsia-600">
-            Match
-          </a>
-          <a href="#" className="transition hover:text-fuchsia-600">
-            Community
-          </a>
+          </Link>
+          <Link to="/connections" className="transition hover:text-fuchsia-600">
+            Connections
+          </Link>
+          <Link to="/requests" className="transition hover:text-fuchsia-600">
+            Requests
+          </Link>
         </div>
 
         <div className="flex items-center gap-3">
@@ -87,13 +89,6 @@ function NavBar() {
                     className="block px-4 py-3 text-sm font-semibold text-violet-700 transition hover:bg-violet-50"
                   >
                     Profile
-                  </Link>
-                  <Link
-                    to="/settings"
-                    onClick={() => setOpen(false)}
-                    className="block px-4 py-3 text-sm font-semibold text-violet-700 transition hover:bg-violet-50"
-                  >
-                    Settings
                   </Link>
                   <button
                     type="button"

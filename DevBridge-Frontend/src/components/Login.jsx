@@ -9,25 +9,50 @@ import { BASE_URL } from "../utils/constants";
 
 
 const Login = () => {
+  const [isLoginForm, setIsLoginForm] = useState(true);
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [emailId, setEmailId] = useState("IronMan@gmail.com");
   const [passWord, setPassWord] = useState("Iron@1234");
   const [error , setError] = useState("");
+  const [successMsg, setSuccessMsg] = useState("");
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
   const handleLogin = async (e) => {
       e.preventDefault();
       setError("");
+      setSuccessMsg("");
       try{
         const res = await axios.post( BASE_URL + "/login", {
           emailId,
           passWord,
         } , {withCredentials : true});
-        console.log(res?.data);
         dispatch(addUser(res.data));
         return navigate("/feed");
       }
       catch(err){
         setError(err?.response?.data || "Something went wrong");
+        console.log(err);
+      }
+  }
+
+  const handleSignup = async (e) => {
+      e.preventDefault();
+      setError("");
+      setSuccessMsg("");
+      try{
+        const res = await axios.post( BASE_URL + "/signup", {
+          firstName,
+          lastName,
+          emailId,
+          passWord,
+        } , {withCredentials : true});
+        setSuccessMsg("Account created successfully! Please sign in.");
+        setIsLoginForm(true);
+      }
+      catch(err){
+        setError(err?.response?.data || "Something went wrong during signup");
         console.log(err);
       }
   }
@@ -49,16 +74,61 @@ const Login = () => {
         </div>
 
         <div className="bg-[#f8f8f8] px-8 py-14 md:px-12 flex flex-col justify-center">
-          <h2 className="m-0 text-3xl font-bold text-slate-900">Sign in</h2>
+          <h2 className="m-0 text-3xl font-bold text-slate-900">{isLoginForm ? "Sign in" : "Sign up"}</h2>
 
           <p className="mt-2 mb-6 text-sm text-slate-500">
-            New to DevBridge?{" "}
-            <span className="text-[#0a66c2] font-semibold cursor-pointer">
-              Join now
+            {isLoginForm ? "New to DevBridge? " : "Already have an account? "}
+            <span 
+              className="text-[#0a66c2] font-semibold cursor-pointer hover:underline"
+              onClick={() => {
+                setIsLoginForm(!isLoginForm);
+                setError("");
+                setSuccessMsg("");
+              }}
+            >
+              {isLoginForm ? "Join now" : "Sign in"}
             </span>
           </p>
 
-          <form className="flex flex-col gap-2" onSubmit={handleLogin}>
+          {successMsg && (
+            <p className="mb-4 rounded-md border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-700">
+              {successMsg}
+            </p>
+          )}
+
+          <form className="flex flex-col gap-2" onSubmit={isLoginForm ? handleLogin : handleSignup}>
+            {!isLoginForm && (
+              <div className="flex gap-4">
+                <div className="flex-1 flex flex-col">
+                  <label htmlFor="firstName" className="text-xs text-slate-500 mb-1">
+                    First Name
+                  </label>
+                  <input
+                    id="firstName"
+                    type="text"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    placeholder="e.g. Tony"
+                    className="h-11 rounded-md border border-slate-300 px-3 text-sm text-slate-900 bg-white outline-none focus:border-[#0a66c2] focus:ring-1 focus:ring-[#0a66c2]"
+                    required
+                  />
+                </div>
+                <div className="flex-1 flex flex-col">
+                  <label htmlFor="lastName" className="text-xs text-slate-500 mb-1">
+                    Last Name
+                  </label>
+                  <input
+                    id="lastName"
+                    type="text"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                    placeholder="e.g. Stark"
+                    className="h-11 rounded-md border border-slate-300 px-3 text-sm text-slate-900 bg-white outline-none focus:border-[#0a66c2] focus:ring-1 focus:ring-[#0a66c2]"
+                  />
+                </div>
+              </div>
+            )}
+
             <label htmlFor="email" className="text-xs text-slate-500">
               Email
             </label>
@@ -69,6 +139,7 @@ const Login = () => {
               onChange={(e) => setEmailId(e.target.value)}
               placeholder="Enter your email"
               className="h-11 rounded-md border border-slate-300 px-3 text-sm text-slate-900 bg-white outline-none focus:border-[#0a66c2] focus:ring-1 focus:ring-[#0a66c2]"
+              required
             />
 
             <label htmlFor="password" className="mt-2 text-xs text-slate-500">
@@ -81,6 +152,7 @@ const Login = () => {
               onChange={(e) => setPassWord(e.target.value)}
               placeholder="Enter password"
               className="h-11 rounded-md border border-slate-300 px-3 text-sm text-slate-900 bg-white outline-none focus:border-[#0a66c2] focus:ring-1 focus:ring-[#0a66c2]"
+              required
             />
             {error && (
               <p className="mt-2 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-600">
@@ -92,7 +164,7 @@ const Login = () => {
               type="submit"
               className="mt-5 h-11 rounded-md bg-[#0a66c2] text-white font-semibold hover:bg-[#0958a9] transition-colors"
             >
-              Sign in
+              {isLoginForm ? "Sign in" : "Sign up"}
             </button>
           </form>
         </div>

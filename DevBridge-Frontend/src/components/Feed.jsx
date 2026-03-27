@@ -9,6 +9,7 @@ const Feed = () => {
   const feed = useSelector((store) => store.feed);
   const dispatch = useDispatch();
   const [error, setError] = useState("");
+  const [actionLoading, setActionLoading] = useState(false);
 
   const getFeed = async () => {
     if (feed?.length) return;
@@ -20,7 +21,24 @@ const Feed = () => {
       dispatch(addFeed(res?.data?.data || []));
     } catch (err) {
       setError("Unable to load feed");
-      console.log(err.message);
+    }
+  };
+
+  const handleCardAction = async (status, toUserId) => {
+    if (actionLoading) return;
+    try {
+      setActionLoading(true);
+      setError("");
+      await axios.post(
+        `${BASE_URL}/request/send/${status}/${toUserId}`,
+        {},
+        { withCredentials: true },
+      );
+      dispatch(addFeed((feed || []).slice(1)));
+    } catch (err) {
+      setError(err?.response?.data?.message || err?.response?.data || "Action failed");
+    } finally {
+      setActionLoading(false);
     }
   };
 
@@ -46,7 +64,14 @@ const Feed = () => {
         </p>
       )}
 
-      {feed?.length > 0 && <UserCard user={feed[0]} />}
+      {feed?.length > 0 && (
+        <UserCard
+          user={feed[0]}
+          loading={actionLoading}
+          onIgnore={() => handleCardAction("ignored", feed[0]._id)}
+          onInterested={() => handleCardAction("interested", feed[0]._id)}
+        />
+      )}
     </div>
   );
 };
