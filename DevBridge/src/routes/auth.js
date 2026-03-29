@@ -1,6 +1,6 @@
 const express = require("express");
 const authRouter = express.Router();
-const { validateSignUpData} = require("../utils/helper");
+const { validateSignUpData } = require("../utils/helper");
 const User = require("../models/users");
 const bcrypt = require("bcrypt");
 const { validateEditProfileData } = require("../utils/helper");
@@ -30,7 +30,6 @@ authRouter.post("/signup", async (req, res) => {
   }
 });
 
-
 /* LOGIN API */
 authRouter.post("/login", async (req, res) => {
   try {
@@ -54,6 +53,9 @@ authRouter.post("/login", async (req, res) => {
 
     res.cookie("token", token, {
       expires: new Date(Date.now() + 8 * 3600000),
+      httpOnly: true,
+      sameSite: "LAX",
+      secure: false, // true ONLY if using HTTPS
     });
 
     res.send(user);
@@ -62,16 +64,13 @@ authRouter.post("/login", async (req, res) => {
   }
 });
 
-
 /* LOGOUT API */
-authRouter.post("/logout" , async (req , res) => {
-  res.cookie("token" , null , {
-    expires : new Date(Date.now()),
-  })
+authRouter.post("/logout", async (req, res) => {
+  res.cookie("token", null, {
+    expires: new Date(Date.now()),
+  });
 
   res.send();
-})
-
-
+});
 
 module.exports = authRouter;
