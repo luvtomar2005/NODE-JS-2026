@@ -3,7 +3,7 @@ const dns = require("dns");
 dns.setServers(["8.8.8.8", "1.1.1.1"]);
 const connectDB = async () => {
     await mongoose.connect(
-        "mongodb+srv://luvtomar2005_db_user:7ps7LcLlCRJAer5l@cluster0.xaaaxev.mongodb.net/DevBridge"
+        "mongodb+srv://luvtomar2005_db_user:tADM2aZEkSLUo8gs@cluster0.xaaaxev.mongodb.net/DevBridge"
     )
 }
 
