@@ -1,4 +1,3 @@
-
 require("dotenv").config();
 
 const express = require("express");
@@ -7,31 +6,44 @@ const connectDB = require("./config/database");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
 
-
+// ---------------- Middleware ----------------
 app.use(cors({
-  origin : "http://localhost:5173",
-  credentials : true,
+  origin: [
+    "http://localhost:5173",     // local frontend
+    "http://3.88.107.114",       // deployed frontend IP (replace if different)
+    "http://18.213.2.133"        // backend IP if testing directly
+  ],
+  credentials: true,
 }));
+
 app.use(express.json());
 app.use(cookieParser());
 
+// ---------------- Test Route ----------------
+app.get("/", (req, res) => {
+  res.status(200).send("Backend deployed successfully");
+});
+
+// ---------------- Routes ----------------
 const authRouter = require("./routes/auth");
-const profileRouter  = require("./routes/profile");
+const profileRouter = require("./routes/profile");
 const requestRouter = require("./routes/request");
 const userRouter = require("./routes/user");
 
+app.use("/", authRouter);
+app.use("/", profileRouter);
+app.use("/", requestRouter);
+app.use("/", userRouter);
 
-app.use("/" , authRouter);
-app.use("/" , profileRouter);
-app.use("/" , requestRouter);
-app.use("/" , userRouter);
+// ---------------- Database + Server Start ----------------
+const PORT = process.env.PORT || 1000;
 
-/* DATABASE CONNECTION */
 connectDB()
   .then(() => {
-    console.log("Database is connected fine...");
-    app.listen(1000, () => {
-      console.log("Server is running at port 1000");
+    console.log("Database connected successfully");
+
+    app.listen(PORT, "0.0.0.0", () => {
+      console.log(`Server is running on port ${PORT}`);
     });
   })
   .catch((err) => {
