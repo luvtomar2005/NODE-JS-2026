@@ -35,15 +35,19 @@ app.use("/", profileRouter);
 app.use("/", requestRouter);
 app.use("/", userRouter);
 
-// ---------------- Database + Server Start ----------------
-const PORT = process.env.PORT || 1000;
+const PORT = 1000;
 
 connectDB()
   .then(() => {
     console.log("Database connected successfully");
 
-    app.listen(PORT, "0.0.0.0", () => {
-      console.log(`Server is running on port ${PORT}`);
+    const server = app.listen(PORT, "0.0.0.0", () => {
+      console.log(`Server is ACTUALLY listening on port ${PORT}`);
+      console.log(server.address());
+    });
+
+    server.on("error", (err) => {
+      console.error("Listen failed:", err);
     });
   })
   .catch((err) => {
