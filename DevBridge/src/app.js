@@ -52,3 +52,19 @@ connectDB()
   .catch((err) => {
     console.error("Database connection failed:", err);
   });
+
+  const sendEmail = require("./utils/sendEmail");
+
+app.get("/send-test-mail", async (req, res) => {
+  try {
+    await sendEmail(
+      process.env.SES_VERIFIED_EMAIL,
+      "DevBridge Test",
+      "Amazon SES is working successfully"
+    );
+
+    res.send("Mail sent successfully");
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
