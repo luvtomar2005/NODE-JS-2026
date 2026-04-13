@@ -5,6 +5,7 @@ const cookieParser = require("cookie-parser");
 const cors = require("cors");
 
 const connectDB = require("./config/database");
+const sendEmail = require("./utils/sendEmail");
 
 const authRouter = require("./routes/auth");
 const profileRouter = require("./routes/profile");
@@ -18,7 +19,7 @@ app.use(
   cors({
     origin: [
       "http://localhost:5173",
-      "http://3.88.107.114"
+      "http://54.226.144.205"
     ],
     credentials: true,
   })
@@ -30,6 +31,21 @@ app.use(cookieParser());
 // ---------------- Health Route ----------------
 app.get("/", (req, res) => {
   res.status(200).send("Backend deployed successfully");
+});
+
+// ---------------- SES Test Route ----------------
+app.get("/send-test-mail", async (req, res) => {
+  try {
+    await sendEmail(
+      process.env.SES_VERIFIED_EMAIL,
+      "DevBridge Test",
+      "Amazon SES is working successfully"
+    );
+
+    res.send("Mail sent successfully");
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
 });
 
 // ---------------- Routes ----------------
@@ -52,19 +68,3 @@ connectDB()
   .catch((err) => {
     console.error("Database connection failed:", err);
   });
-
-  const sendEmail = require("./utils/sendEmail");
-
-app.get("/send-test-mail", async (req, res) => {
-  try {
-    await sendEmail(
-      process.env.SES_VERIFIED_EMAIL,
-      "DevBridge Test",
-      "Amazon SES is working successfully"
-    );
-
-    res.send("Mail sent successfully");
-  } catch (err) {
-    res.status(500).send(err.message);
-  }
-});
