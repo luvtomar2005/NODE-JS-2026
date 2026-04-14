@@ -11,7 +11,7 @@ const userAuth = async (req, res, next) => {
         }
 
         // Case 2: token exists but verify may fail
-        const decodeObj = jwt.verify(token, "DevBridge@14022005");
+        const decodeObj = jwt.verify(token, process.env.JWT_SECRET);
         const { _id } = decodeObj;
 
         const user = await User.findById(_id);
