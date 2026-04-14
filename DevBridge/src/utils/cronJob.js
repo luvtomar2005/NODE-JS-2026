@@ -5,7 +5,7 @@ const sendEmail = require("./sendEmail");
 const ConnectionRequestModel = require("../models/connectionRequest");
 
 // Runs every day at 8:00 AM
-cron.schedule("* * * * *", async () => {
+cron.schedule("0 8 * * *", async () => {
   console.log("Cron job triggered at:", new Date());
 
   try {
