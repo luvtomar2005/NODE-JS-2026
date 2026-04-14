@@ -1,10 +1,10 @@
 const express = require("express");
 const requestRouter = express.Router();
 
-const { userAuth } = require("../middleware/auth")
+const { userAuth } = require("../middleware/auth");
 const ConnectionRequest = require("../models/connectionRequest");
 const User = require("../models/users");
-
+const sendEmail = require("../utils/sendEmail"); // <-- adjust path if needed
 
 requestRouter.post(
   "/request/send/:status/:toUserId",
@@ -12,8 +12,7 @@ requestRouter.post(
   async (req, res) => {
     try {
       const fromUserId = req.user._id;
-      const toUserId = req.params.toUserId;
-      const status = req.params.status;
+      const { status, toUserId } = req.params;
 
       const allowedStatus = ["ignored", "interested"];
       if (!allowedStatus.includes(status)) {
@@ -22,23 +21,27 @@ requestRouter.post(
           .json({ message: "Invalid status type: " + status });
       }
 
+      // Check receiver exists
       const toUser = await User.findById(toUserId);
       if (!toUser) {
         return res.status(404).json({ message: "User not found!" });
       }
 
+      // Prevent duplicate request in either direction
       const existingConnectionRequest = await ConnectionRequest.findOne({
         $or: [
           { fromUserId, toUserId },
           { fromUserId: toUserId, toUserId: fromUserId },
         ],
       });
+
       if (existingConnectionRequest) {
-        return res
-          .status(400)
-          .send({ message: "Connection Request Already Exists!!" });
+        return res.status(400).json({
+          message: "Connection Request Already Exists!!",
+        });
       }
 
+      // Save request
       const connectionRequest = new ConnectionRequest({
         fromUserId,
         toUserId,
@@ -47,14 +50,26 @@ requestRouter.post(
 
       const data = await connectionRequest.save();
 
+      // Send email only if interested
+      if (status === "interested") {
+        try {
+          await sendEmail({
+            to: toUser.emailId, // <-- verify field name in User schema
+            subject: "New connection request on DevBridge",
+            message: `${req.user.firstName} wants to connect with you on DevBridge.`,
+          });
+        } catch (emailError) {
+          console.error("Email sending failed:", emailError.message);
+          // Don't fail the request if email fails
+        }
+      }
 
-      res.json({
-        message:
-          req.user.firstName + " is " + status + " in " + toUser.firstName,
+      return res.json({
+        message: `${req.user.firstName} is ${status} in ${toUser.firstName}`,
         data,
       });
     } catch (err) {
-      res.status(400).send("ERROR: " + err.message);
+      return res.status(400).send("ERROR: " + err.message);
     }
   }
 );
@@ -69,7 +84,9 @@ requestRouter.post(
 
       const allowedStatus = ["accepted", "rejected"];
       if (!allowedStatus.includes(status)) {
-        return res.status(400).json({ messaage: "Status not allowed!" });
+        return res.status(400).json({
+          message: "Status not allowed!",
+        });
       }
 
       const connectionRequest = await ConnectionRequest.findOne({
@@ -77,22 +94,24 @@ requestRouter.post(
         toUserId: loggedInUser._id,
         status: "interested",
       });
+
       if (!connectionRequest) {
-        return res
-          .status(404)
-          .json({ message: "Connection request not found" });
+        return res.status(404).json({
+          message: "Connection request not found",
+        });
       }
 
       connectionRequest.status = status;
-
       const data = await connectionRequest.save();
 
-      res.json({ message: "Connection request " + status, data });
+      return res.json({
+        message: "Connection request " + status,
+        data,
+      });
     } catch (err) {
-      res.status(400).send("ERROR: " + err.message);
+      return res.status(400).send("ERROR: " + err.message);
     }
   }
 );
 
 module.exports = requestRouter;
-
