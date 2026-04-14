@@ -1,5 +1,5 @@
 require("dotenv").config();
-
+require("./utils/cronJob");
 const express = require("express");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
