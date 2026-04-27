@@ -3,6 +3,8 @@ require("./utils/cronJob");
 const express = require("express");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
+const http = require("http");
+const initializeSocket = require("./utils/socket");
 
 const connectDB = require("./config/database");
 const sendEmail = require("./utils/sendEmail");
@@ -58,6 +60,9 @@ app.use("/", userRouter);
 
 // ---------------- Server Start ----------------
 const PORT = process.env.PORT || 3000;
+
+const server = http.createServer(app);
+initializeSocket(server);
 
 connectDB()
   .then(() => {
