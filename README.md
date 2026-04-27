@@ -5,6 +5,78 @@ The focus of this project is understanding **how Node.js works under the hood**,
 
 ---
 
+# DevBridge (Local + Deployment Setup)
+
+This repository now also includes a full-stack app: **DevBridge**.
+
+- Frontend: `DevBridge-Frontend` (React + Vite)
+- Backend: `DevBridge` (Node.js + Express + MongoDB)
+
+## How it works in both local and deployment
+
+The app is made environment-safe using:
+
+- **Frontend env-based API URL** (`VITE_API_BASE_URL`)
+- **Vite local proxy** (`/api` -> backend target for local development)
+- **Backend env-based CORS origins** (`CORS_ORIGINS`)
+
+This means:
+
+- Local machine can use `localhost` ports.
+- EC2 deployment can use your domain/IP without code edits.
+
+## Frontend env (`DevBridge-Frontend/.env`)
+
+```env
+VITE_API_BASE_URL=/api
+VITE_PROXY_TARGET=http://localhost:3000
+```
+
+Notes:
+- `VITE_API_BASE_URL=/api` works with local Vite proxy and reverse-proxy setups.
+- If frontend and backend are on different domains in production, set:
+  - `VITE_API_BASE_URL=https://your-backend-domain.com`
+
+## Backend env (`DevBridge/.env`)
+
+```env
+PORT=3000
+DB_CONNECTION=mongodb+srv://<username>:<password>@<cluster-url>/<db-name>
+JWT_SECRET=replace_with_secure_secret
+SES_VERIFIED_EMAIL=you@example.com
+CORS_ORIGINS=http://localhost:5173,https://your-frontend-domain.com
+```
+
+## Local run steps
+
+1. Start backend
+```bash
+cd DevBridge
+npm install
+npm run dev
+```
+
+2. Start frontend
+```bash
+cd DevBridge-Frontend
+npm install
+npm run dev
+```
+
+3. Verify API calls
+- Frontend calls `/api/*`
+- Vite proxies `/api/*` to `VITE_PROXY_TARGET`
+- Backend handles routes like `/login`, `/signup`, `/feed`, etc.
+
+## Deployment notes (EC2)
+
+- Configure your frontend env for your deployed backend (or keep `/api` with Nginx reverse proxy).
+- Set backend `CORS_ORIGINS` to your deployed frontend URL.
+- Restart both services after env changes.
+- Ensure cookie-based auth works with your HTTPS setup and domain.
+
+---
+
 # Topics Covered
 
 ### Node.js Basics
