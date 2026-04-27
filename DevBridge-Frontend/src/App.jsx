@@ -7,7 +7,7 @@ import { Provider } from "react-redux";
 import { useSelector } from "react-redux";
 import appStore from "./utils/appStore";
 import Feed from "./components/Feed";
-import Connections from "./components/Connections";
+import Chat from "./components/Chat";
 import Requests from "./components/Requests";
 
 function AppRoutes() {
@@ -29,7 +29,7 @@ function AppRoutes() {
           ></Route>
           <Route
             path="connections"
-            element={user ? <Connections /> : <Navigate to="/login" replace />}
+            element={user ? <Chat /> : <Navigate to="/login" replace />}
           ></Route>
           <Route
             path="requests"
