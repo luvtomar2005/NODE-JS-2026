@@ -26,6 +26,27 @@ userRouter.get("/user/requests/received", userAuth, async (req, res) => {
   }
 });
 
+// API for getting all requests sent by logged-in user
+userRouter.get("/user/requests/sent", userAuth, async (req, res) => {
+  try {
+    const loggedInUser = req.user;
+    const sentRequests = await ConnectionRequestModel.find({
+      fromUserId: loggedInUser._id,
+      status: "interested",
+    }).populate(
+      "toUserId",
+      "firstName lastName photoUrl age gender about skills",
+    );
+
+    res.json({
+      message: "Sent requests fetched successfully",
+      data: sentRequests,
+    });
+  } catch (err) {
+    res.status(500).send("Error is there which is " + err.message);
+  }
+});
+
 
 
 // Creating api for getting all the connections
@@ -38,7 +59,6 @@ userRouter.get("/user/connections" , userAuth , async(req  , res) => {
                 {fromUserId : loggedInUser._id , status : "accepted"},
             ],
         }).populate("fromUserId" , USER_SAFE_DATA).populate("toUserId" , USER_SAFE_DATA)
-        console.log(connectionRequests);
         const data = connectionRequests.map((row) => {
             if(row.fromUserId._id.toString() === loggedInUser._id.toString()){
                 // If YOU are sender → return the other person (receiver)
@@ -51,7 +71,7 @@ userRouter.get("/user/connections" , userAuth , async(req  , res) => {
 
     }
     catch(err){
-        res.status(404).send("Error message is " + err.message);
+        res.status(500).send("Error message is " + err.message);
     }
 })
 

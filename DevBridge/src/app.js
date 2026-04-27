@@ -14,13 +14,15 @@ const userRouter = require("./routes/user");
 
 const app = express();
 
+const allowedOrigins = (process.env.CORS_ORIGINS || "http://localhost:5173")
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
 // ---------------- Middleware ----------------
 app.use(
   cors({
-    origin: [
-      "http://localhost:5173",
-      "http://54.226.144.205"
-    ],
+    origin: allowedOrigins,
     credentials: true,
   })
 );

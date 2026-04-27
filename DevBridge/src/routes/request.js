@@ -53,11 +53,11 @@ requestRouter.post(
       // Send email only if interested
       if (status === "interested") {
         try {
-          await sendEmail({
-            to: toUser.emailId, // <-- verify field name in User schema
-            subject: "New connection request on DevBridge",
-            message: `${req.user.firstName} wants to connect with you on DevBridge.`,
-          });
+          await sendEmail(
+            toUser.emailId,
+            "New connection request on DevBridge",
+            `${req.user.firstName} wants to connect with you on DevBridge.`,
+          );
         } catch (emailError) {
           console.error("Email sending failed:", emailError.message);
           // Don't fail the request if email fails

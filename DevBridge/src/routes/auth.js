@@ -3,7 +3,6 @@ const authRouter = express.Router();
 const { validateSignUpData } = require("../utils/helper");
 const User = require("../models/users");
 const bcrypt = require("bcrypt");
-const { validateEditProfileData } = require("../utils/helper");
 
 /* SIGNUP API */
 authRouter.post("/signup", async (req, res) => {
