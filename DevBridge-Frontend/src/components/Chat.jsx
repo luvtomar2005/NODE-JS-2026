@@ -100,6 +100,16 @@ const Chat = () => {
       });
     });
 
+    socket.on("messageDeleted", ({ chatId, messageId }) => {
+      if (!chatId || !messageId) return;
+      setMessageByChat((prev) => ({
+        ...prev,
+        [chatId]: (prev[chatId] || []).filter(
+          (message) => (message._id || message.id) !== messageId,
+        ),
+      }));
+    });
+
     socket.on("chatError", (payload) => {
       setError(payload?.message || "Socket error occurred");
     });
@@ -177,6 +187,14 @@ const Chat = () => {
   const toggleBookmark = (id) => setBookmarks((prev) => ({ ...prev, [id]: !prev[id] }));
   const toggleReaction = (id) => setReactions((prev) => ({ ...prev, [id]: !prev[id] }));
   const codeCount = messages.filter((m) => m.type === "code").length;
+  const handleDeleteMessage = (messageId) => {
+    if (!messageId || !activeRoomId || !user?._id || !socketRef.current) return;
+    socketRef.current.emit("deleteMessage", {
+      chatId: activeRoomId,
+      messageId,
+      userId: user._id,
+    });
+  };
 
   return (
     <div className="mx-auto grid h-[calc(100vh-8.5rem)] max-w-7xl grid-cols-12 gap-4 px-4 py-5">
@@ -307,6 +325,14 @@ const Chat = () => {
                     >
                       Save
                     </button>
+                    {mine && (
+                      <button
+                        onClick={() => handleDeleteMessage(messageId)}
+                        className="rounded-md border border-red-500/60 bg-red-500/15 px-2 py-1 text-xs text-red-200 hover:bg-red-500/25"
+                      >
+                        Delete
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>

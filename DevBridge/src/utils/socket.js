@@ -95,6 +95,44 @@ const initializeSocket = (server) => {
       }
     });
 
+    socket.on("deleteMessage", async ({ chatId, messageId, userId }) => {
+      try {
+        if (!chatId || !messageId || !userId) {
+          return socket.emit("chatError", {
+            message: "chatId, messageId and userId are required to delete a message",
+          });
+        }
+        if (
+          !mongoose.Types.ObjectId.isValid(messageId) ||
+          !mongoose.Types.ObjectId.isValid(userId)
+        ) {
+          return socket.emit("chatError", {
+            message: "messageId and userId must be valid ObjectIds",
+          });
+        }
+
+        const deletedMessage = await Message.findOneAndDelete({
+          _id: messageId,
+          chatId,
+          senderId: userId,
+        });
+
+        if (!deletedMessage) {
+          return socket.emit("chatError", {
+            message: "Message not found or you are not allowed to delete it",
+          });
+        }
+
+        io.to(chatId).emit("messageDeleted", {
+          chatId,
+          messageId: deletedMessage._id.toString(),
+        });
+      } catch (error) {
+        console.error("Error deleting message:", error);
+        socket.emit("chatError", { message: "Failed to delete message" });
+      }
+    });
+
     socket.on("disconnect", (reason) => {
       console.log("User disconnected, socket ID:", socket.id, "reason:", reason);
     });
