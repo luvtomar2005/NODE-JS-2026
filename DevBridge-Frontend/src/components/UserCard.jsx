@@ -11,8 +11,6 @@ const UserCard = ({ user, onIgnore, onInterested, loading = false }) => {
   const [exitDirection, setExitDirection] = useState(null);
   const startXRef = useRef(0);
 
-  if (!user) return null;
-
   const fullName = `${user?.firstName || ""} ${user?.lastName || ""}`.trim();
   const ageText = user?.age ? `${user.age}` : "N/A";
   const genderText = user?.gender || "Not specified";
@@ -80,6 +78,8 @@ const UserCard = ({ user, onIgnore, onInterested, loading = false }) => {
     }
     setDragX(0);
   };
+
+  if (!user) return null;
 
   return (
     <div className="mx-auto w-full max-w-sm">

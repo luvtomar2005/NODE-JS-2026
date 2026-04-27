@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { BASE_URL } from "../utils/constants";
-import { addFeed } from "../utils/FeedSlice";
+import { addFeed, removeFirstFeedItem } from "../utils/FeedSlice";
 import axios from "axios";
 import UserCard from "./UserCard";
 
@@ -34,7 +34,7 @@ const Feed = () => {
         {},
         { withCredentials: true },
       );
-      dispatch(addFeed((feed || []).slice(1)));
+      dispatch(removeFirstFeedItem());
     } catch (err) {
       setError(err?.response?.data?.message || err?.response?.data || "Action failed");
     } finally {

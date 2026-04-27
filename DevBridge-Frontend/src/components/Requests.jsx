@@ -7,6 +7,10 @@ const Requests = () => {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const errorText =
+    typeof error === "string"
+      ? error
+      : error?.message || JSON.stringify(error || "");
 
   const fetchRequests = async (type) => {
     setLoading(true);
@@ -81,8 +85,8 @@ const Requests = () => {
       {error && !loading && (
         <div className="mt-20 flex w-full justify-center">
             <div className="rounded-lg bg-red-50 border border-red-200 px-6 py-4 text-center text-lg font-semibold text-red-600 shadow-sm max-w-md">
-                {error}
-                {activeTab === "sent" && error.includes("404") && (
+                {errorText}
+                {activeTab === "sent" && errorText.includes("404") && (
                    <p className="mt-2 text-sm text-red-500 font-normal">If your backend lacks the `/user/requests/sent` route, you may see a 404.</p>
                 )}
             </div>
@@ -125,9 +129,10 @@ const Requests = () => {
             
             if (!user || (!user._id && !user.id)) return null;
 
+            const requestKey = req._id || `${activeTab}-${user._id || user.id}`;
             return (
               <div
-                key={req._id || Math.random()}
+                key={requestKey}
                 className="flex flex-col gap-4 rounded-xl border border-violet-100 bg-white p-4 shadow-sm transition hover:shadow-md sm:flex-row sm:items-center sm:justify-between"
               >
                 <div className="flex items-center gap-4">

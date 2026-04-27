@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import { BASE_URL } from "../utils/constants";
@@ -20,6 +20,17 @@ const EditProfile = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+
+  useEffect(() => {
+    if (!user) return;
+    setFirstName(user.firstName || "");
+    setLastName(user.lastName || "");
+    setAbout(user.about || "");
+    setSkillsInput(Array.isArray(user.skills) ? user.skills.join(", ") : "");
+    setPhotoUrl(user.photoUrl || "");
+    setAge(user.age || "");
+    setGender(user.gender || "");
+  }, [user]);
 
   const parsedSkills = useMemo(
     () =>
