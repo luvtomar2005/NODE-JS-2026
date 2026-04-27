@@ -13,6 +13,7 @@ const authRouter = require("./routes/auth");
 const profileRouter = require("./routes/profile");
 const requestRouter = require("./routes/request");
 const userRouter = require("./routes/user");
+const chatRouter = require("./routes/chat");
 
 const app = express();
 
@@ -57,6 +58,7 @@ app.use("/", authRouter);
 app.use("/", profileRouter);
 app.use("/", requestRouter);
 app.use("/", userRouter);
+app.use("/", chatRouter);
 
 // ---------------- Server Start ----------------
 const PORT = process.env.PORT || 3000;
@@ -68,7 +70,7 @@ connectDB()
   .then(() => {
     console.log("Database connected successfully");
 
-    app.listen(PORT, "0.0.0.0", () => {
+    server.listen(PORT, "0.0.0.0", () => {
       console.log(`Server is running on port ${PORT}`);
     });
   })
