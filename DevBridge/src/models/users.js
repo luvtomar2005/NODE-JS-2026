@@ -69,10 +69,13 @@ const userSchema = new mongoose.Schema(
 /* GENERATE JWT TOKEN */
 userSchema.methods.getJWT = async function () {
   const user = this;
+  if (!process.env.JWT_SECRET) {
+    throw new Error("Missing required environment variable: JWT_SECRET");
+  }
 
   const token = jwt.sign(
     { _id: user._id },
-    "DevBridge@14022005",
+    process.env.JWT_SECRET,
     { expiresIn: "7d" }
   );
 

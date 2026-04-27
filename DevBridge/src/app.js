@@ -17,6 +17,19 @@ const chatRouter = require("./routes/chat");
 
 const app = express();
 
+const dbUri = process.env.DB_URI || process.env.DB_CONNECTION;
+const requiredEnvs = ["JWT_SECRET"];
+const missingRequiredEnvs = requiredEnvs.filter((envName) => !process.env[envName]);
+if (!dbUri) {
+  missingRequiredEnvs.push("DB_URI (or legacy DB_CONNECTION)");
+}
+if (missingRequiredEnvs.length > 0) {
+  console.error(
+    `Missing required environment variable(s): ${missingRequiredEnvs.join(", ")}`
+  );
+  process.exit(1);
+}
+
 const allowedOrigins = (process.env.CORS_ORIGINS || "http://localhost:5173")
   .split(",")
   .map((origin) => origin.trim())

@@ -1,1 +1,6 @@
+# Never commit secrets. Keep env files local or in a secret manager.
 .env
+.env.*
+
+# Dependencies
+node_modules
