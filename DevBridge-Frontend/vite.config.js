@@ -15,6 +15,10 @@ export default defineConfig(() => {
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api/, ""),
         },
+        "/socket.io": {
+          target: proxyTarget,
+          ws: true,
+        },
       },
     },
   };
