@@ -20,8 +20,10 @@ const Requests = () => {
       const res = await axios.get(BASE_URL + endpoint, {
         withCredentials: true,
       });
-      // Support common backend response structures
-      setRequests(res.data?.data || res.data || []);
+      // Do not guess payload shape. Backend contract must always return { data: [] }.
+      // Fallback logic masks API bugs and can map sender/receiver incorrectly.
+      const payload = res?.data?.data;
+      setRequests(Array.isArray(payload) ? payload : []);
     } catch (err) {
       setError(err?.response?.data || `Failed to load ${type} requests.`);
     } finally {
@@ -123,10 +125,12 @@ const Requests = () => {
       {!loading && !error && requests?.length > 0 && (
         <div className="flex flex-col gap-4">
           {requests.map((req) => {
-            const user = activeTab === "received" 
-              ? (req.fromUserId || req.sender || req) 
-              : (req.toUserId || req.receiver || req);
-            
+            // Sender/receiver flow:
+            // - received tab shows requests sent TO me, so render sender profile from req.fromUserId
+            // - sent tab shows requests sent BY me, so render receiver profile from req.toUserId
+            // Never fallback to arbitrary keys, otherwise requests can appear under the wrong user.
+            const user = activeTab === "received" ? req.fromUserId : req.toUserId;
+
             if (!user || (!user._id && !user.id)) return null;
 
             const requestKey = req._id || `${activeTab}-${user._id || user.id}`;

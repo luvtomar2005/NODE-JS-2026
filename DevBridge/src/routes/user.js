@@ -10,19 +10,29 @@ const USER_SAFE_DATA = "firstName lastName photoUrl age gender about skills";
 userRouter.get("/user/requests/received", userAuth, async (req, res) => {
   try {
     const loggedInUser = req.user;
-    const connectionRequests = await ConnectionRequestModel.find({
+    const receivedRequests = await ConnectionRequestModel.find({
       toUserId: loggedInUser._id,
       status: "interested",
-    }).populate(
-      "fromUserId",
-      "firstName lastName photoUrl age gender about skills",
-    );
-     res.json({
-      message: "Data fetched successfully",
-      data: connectionRequests,
+    }).populate("fromUserId", USER_SAFE_DATA);
+
+    // `received` means "someone sent a request to me", so we must include sender details.
+    // populate(fromUserId) guarantees the frontend gets a full sender profile object instead
+    // of only an ObjectId, which keeps sender/receiver mapping deterministic.
+    const data = receivedRequests.filter((request) => request.fromUserId);
+
+    res.json({
+      success: true,
+      type: "received",
+      message: "Received requests fetched successfully",
+      count: data.length,
+      data,
     });
   } catch (err) {
-    res.status(404).send("Error is there which is " + err.message);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch received requests",
+      error: err.message,
+    });
   }
 });
 
@@ -33,17 +43,26 @@ userRouter.get("/user/requests/sent", userAuth, async (req, res) => {
     const sentRequests = await ConnectionRequestModel.find({
       fromUserId: loggedInUser._id,
       status: "interested",
-    }).populate(
-      "toUserId",
-      "firstName lastName photoUrl age gender about skills",
-    );
+    }).populate("toUserId", USER_SAFE_DATA);
+
+    // `sent` means "I sent this request", so we must include receiver details.
+    // populate(toUserId) ensures the frontend can always render the target user
+    // without guessing alternate keys like sender/receiver/raw request.
+    const data = sentRequests.filter((request) => request.toUserId);
 
     res.json({
+      success: true,
+      type: "sent",
       message: "Sent requests fetched successfully",
-      data: sentRequests,
+      count: data.length,
+      data,
     });
   } catch (err) {
-    res.status(500).send("Error is there which is " + err.message);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch sent requests",
+      error: err.message,
+    });
   }
 });
 
